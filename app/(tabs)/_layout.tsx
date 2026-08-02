@@ -1,20 +1,26 @@
 import { Tabs } from "expo-router";
-import { Image, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import clsx from "clsx";
 
 import { tabs } from "@/constants/data";
-import { components } from "@/constants/theme";
+import { colors, components } from "@/constants/theme";
 
 const ACTIVE_COLOR = "#4F46E5";
 const INACTIVE_COLOR = "#94A3B8";
 
-const tabBar = components.tabBar;
+const tabBar = components.tabBar
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
-  const TabIcon = ({ focused, icon }: { focused: boolean; icon: any }) => (
+  const TabIcon = ({
+    focused,
+    icon,
+  }: {
+    focused: boolean;
+    icon: any;
+  }) => (
     <View className='items-center justify-center'>
       <View
         className={clsx(
@@ -75,8 +81,8 @@ export default function TabLayout() {
         tabBarIconStyle: {
           width: tabBar.iconFrame,
           height: tabBar.iconFrame,
-          alignItems: "center",
-        },
+          alignItems: 'center'
+        }
       }}>
       {tabs.map((tab) => (
         <Tabs.Screen
