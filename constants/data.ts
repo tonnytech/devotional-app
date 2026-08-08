@@ -1,8 +1,30 @@
 import { icons } from "./icons";
 
-export const tabs = [
-  { name: "index", title: "Home", icon: icons.home },
-  { name: "subscriptions", title: "Subscriptions", icon: icons.book },
-  { name: "insights", title: "Insights", icon: icons.chat },
-  { name: "settings", title: "Settings", icon: icons.setting },
+export interface TabItem {
+  name: string;
+  title: string;
+  icon: any; // Or ImageSourcePropType from 'react-native'
+}
+
+export const tabs: TabItem[] = [
+  {
+    name: "index",
+    title: "Daily",
+    icon: icons.home,
+  },
+  {
+    name: "plans",
+    title: "Plans",
+    icon: icons.wallet,
+  },
+  {
+    name: "journal",
+    title: "Journal",
+    icon: icons.activity,
+  },
+  {
+    name: "profile",
+    title: "Profile",
+    icon: icons.setting,
+  },
 ];

@@ -54,7 +54,7 @@ export default function HomeScreen() {
             <Text className='text-xs font-semibold tracking-wider text-indigo-600 uppercase'>
               {getGreeting()}
             </Text>
-            <Text className='text-2xl font-bold text-slate-800'>
+            <Text className='text-2xl font-sans-light text-slate-800'>
               Daily Devotional
             </Text>
           </View>
