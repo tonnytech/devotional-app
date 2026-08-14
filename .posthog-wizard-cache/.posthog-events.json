@@ -1,0 +1,27 @@
+[
+  {
+    "event": "user_signed_in",
+    "description": "A user completes password or client-trust sign-in.",
+    "file": "app/(auth)/sign-in.tsx"
+  },
+  {
+    "event": "user_signed_up",
+    "description": "A user completes email verification and account creation.",
+    "file": "app/(auth)/sign-up.tsx"
+  },
+  {
+    "event": "user_signed_out",
+    "description": "A signed-in user completes sign-out.",
+    "file": "app/(tabs)/settings.tsx"
+  },
+  {
+    "event": "subscription_details_toggled",
+    "description": "A user expands or collapses a subscription summary to view details.",
+    "file": "app/(tabs)/index.tsx"
+  },
+  {
+    "event": "daily_verse_bookmark_toggled",
+    "description": "A user bookmarks or removes the bookmark from the daily verse.",
+    "file": "app/(tabs)/index2.tsx"
+  }
+]

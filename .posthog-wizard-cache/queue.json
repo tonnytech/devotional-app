@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "runId": "55d64549-7a57-487d-a96a-943ee869cf2d",
+  "tasks": [
+    {
+      "id": "6f1d313e-3f61-4598-9214-f12af187a7f4",
+      "type": "install",
+      "label": "Add PostHog SDK",
+      "status": "done",
+      "dependsOn": [],
+      "inputs": {},
+      "attempts": 1,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:06:56.656Z",
+      "startedAt": "2026-08-14T10:07:07.592Z",
+      "handoff": {
+        "goals": "Install the PostHog React Native SDK using the project's package manager, including required peer/configuration libraries.",
+        "did": "Installed `posthog-react-native`, its required `react-native-svg` peer dependency, and `react-native-config` with the detected npm package manager. The resolved published versions are declared in `package.json` and locked in `package-lock.json`; later integration steps should import from `posthog-react-native` and load build-time configuration through `react-native-config`.",
+        "forNextAgent": "Use `posthog-react-native` for client instrumentation and `react-native-config` for `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST`. This Expo project now has native dependencies that may require a development build/prebuild rather than Expo Go for runtime validation.",
+        "filesTouched": [
+          "package.json",
+          "package-lock.json"
+        ],
+        "evidence": "Ran `npm add posthog-react-native react-native-svg react-native-config` successfully. npm reported 17 packages added; manifest contains `posthog-react-native` `^4.63.0`, `react-native-config` `^1.6.1`, and `react-native-svg` `^15.15.5`; corresponding root dependency entries appear in `package-lock.json`.",
+        "assumptions": "No server-side event-sending code was evaluated because this task was limited to installing the React Native client SDK and explicitly required peers/configuration library. The npm peer-resolution output was warnings for existing Clerk/React version constraints and did not prevent installation.",
+        "conflict": "None; installation completed despite non-fatal existing Clerk/React peer-dependency warnings."
+      },
+      "finishedAt": "2026-08-14T10:09:03.880Z"
+    },
+    {
+      "id": "d32eac87-ca5f-43fb-b5e6-0e74dc147e79",
+      "type": "init",
+      "label": "Configure PostHog",
+      "status": "done",
+      "dependsOn": [],
+      "inputs": {},
+      "attempts": 1,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:06:56.660Z",
+      "startedAt": "2026-08-14T10:07:07.597Z",
+      "handoff": {
+        "goals": "Initialize PostHog once for the Expo React Native app, configure its environment variables, and document those variables for developers.",
+        "did": "Created `lib/posthog.ts`, which constructs the singleton `posthog` client from `EXPO_PUBLIC_POSTHOG_PROJECT_TOKEN` and `EXPO_PUBLIC_POSTHOG_HOST`. It captures app lifecycle events and enables SDK debug logging in development. If either setting is missing, development logs the prescribed clear configuration error; production leaves `posthog` null so app startup remains a no-op. Updated `app/_layout.tsx` to mount `PostHogProvider` around the Expo Router stack only when the singleton is configured, making `usePostHog()` the downstream call-site access pattern. Wrote the real public token and host to `.env` through `set_env_values`, and created `.env.example` with non-production placeholder/documentation values. This establishes the shared PostHog client for all future identification, capture, and error-tracking work.",
+        "forNextAgent": "Import `usePostHog` from `posthog-react-native` in components nested under the root layout; it reaches the singleton provided by `PostHogProvider`. For module-level/non-React work, import `{ posthog }` from `@/lib/posthog` and guard for null. Do not construct a second client. The app uses Expo Router rather than a manually declared NavigationContainer. No web Content-Security-Policy was found or changed. The SDK dependencies (`posthog-react-native`, `react-native-svg`, and `react-native-config`) were already added to `package.json` by the concurrent install task; this task did not install packages or run builds/tests as instructed.",
+        "filesTouched": [
+          ".env",
+          ".env.example",
+          "lib/posthog.ts",
+          "app/_layout.tsx"
+        ],
+        "evidence": "`check_env_keys` verified both `EXPO_PUBLIC_POSTHOG_PROJECT_TOKEN` and `EXPO_PUBLIC_POSTHOG_HOST` are present in `.env`. Final reads verified the client module and root-provider wiring. `package.json` showed `posthog-react-native` and `react-native-svg` installed. No builds, linters, or tests were run per task instructions.",
+        "assumptions": "Expo public environment variables are embedded at build time and are the codebase's existing environment convention, evidenced by `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` in the root layout. Since this is an Expo app, the Expo environment convention was used instead of bare React Native's `react-native-config` access pattern."
+      },
+      "finishedAt": "2026-08-14T10:09:25.802Z"
+    },
+    {
+      "id": "e74eb550-6c31-444d-ba28-51775f314f61",
+      "type": "identify",
+      "label": "Add user identification",
+      "status": "done",
+      "dependsOn": [
+        "6f1d313e-3f61-4598-9214-f12af187a7f4",
+        "d32eac87-ca5f-43fb-b5e6-0e74dc147e79"
+      ],
+      "inputs": {},
+      "attempts": 1,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:06:59.913Z",
+      "startedAt": "2026-08-14T10:09:28.610Z",
+      "handoff": {
+        "goals": "Identify authenticated client users with a stable identifier at completed login/sign-up and reset PostHog identity after logout.",
+        "did": "Updated `app/(auth)/sign-in.tsx` to identify with Clerk `session.userId` after successful password and MFA/client-trust sign-in completion, while writing email only to the `$set` person property. Updated `app/(auth)/sign-up.tsx` to identify newly verified users with the same stable Clerk ID and email person property. Updated `app/(tabs)/settings.tsx` to call `posthog.reset()` only after Clerk sign-out succeeds. This lets all later client captures and SDK-reported errors inherit the persistent Clerk identity, and prevents identity leakage between users after logout.",
+        "forNextAgent": "This is a client-only Expo app. Do not identify again in ordinary event/error call sites: use the shared initialized client (`usePostHog()` within the root provider or guarded `posthog` from `@/lib/posthog`) and it will inherit the persisted distinct ID. Do not place email, names, or other PII in event properties.",
+        "filesTouched": [
+          "app/(auth)/sign-in.tsx",
+          "app/(auth)/sign-up.tsx",
+          "app/(tabs)/settings.tsx"
+        ],
+        "evidence": "Final source reads verified the three guarded `posthog?.identify(session.userId, { $set: { email } })` calls in completed Clerk auth paths and `posthog?.reset()` after successful sign-out. No builds, linters, or tests were run because this task explicitly prohibited them.",
+        "assumptions": "Clerk's finalized session exposes `userId`, as used by the app's authenticated Clerk session flow; calls are guarded so no undefined distinct ID is passed. Email is available from the completed auth form and is used only as a person property.",
+        "conflict": "None."
+      },
+      "finishedAt": "2026-08-14T10:11:08.044Z"
+    },
+    {
+      "id": "73b0497e-e61c-40e3-8006-88ceeabf8cc1",
+      "type": "error-tracking",
+      "label": "Capture unhandled errors",
+      "status": "done",
+      "dependsOn": [
+        "6f1d313e-3f61-4598-9214-f12af187a7f4",
+        "d32eac87-ca5f-43fb-b5e6-0e74dc147e79"
+      ],
+      "inputs": {},
+      "attempts": 1,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:06:59.915Z",
+      "startedAt": "2026-08-14T10:09:28.620Z",
+      "handoff": {
+        "goals": "Configure one global React Native/Expo error-capture mechanism so otherwise uncaught rendering errors reach PostHog.",
+        "did": "Edited app/_layout.tsx to mount the SDK-provided PostHogErrorBoundary inside the existing conditional PostHogProvider and around the Expo Router Stack. Added a minimal RootErrorFallback UI. This captures root-level React rendering exceptions as PostHog error-tracking exceptions through the SDK rather than manual capture calls. It feeds the PostHog Error Tracking exception stream for uncaught render failures.",
+        "forNextAgent": "The error boundary is conditional with the already-configured posthog singleton, preserving the existing no-op behavior when configuration is absent. No other error handlers or per-route wrappers were added. Later review/build work should validate compilation and runtime delivery.",
+        "filesTouched": [
+          "app/_layout.tsx"
+        ],
+        "evidence": "Read the task guidance, React Native SDK reference, and final app/_layout.tsx. The final source shows PostHogErrorBoundary wrapping the router Stack within PostHogProvider.",
+        "assumptions": "Assumed posthog-react-native ^4.63.0 exports PostHogErrorBoundary as documented by the supplied React Native reference. No build or tests were run, as explicitly required."
+      },
+      "finishedAt": "2026-08-14T10:10:10.952Z"
+    },
+    {
+      "id": "e3a19029-a0b3-4486-a431-947f2ecc814b",
+      "type": "capture",
+      "label": "Instrument key events",
+      "status": "done",
+      "dependsOn": [
+        "e74eb550-6c31-444d-ba28-51775f314f61"
+      ],
+      "inputs": {},
+      "attempts": 1,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:07:01.426Z",
+      "startedAt": "2026-08-14T10:11:10.616Z",
+      "handoff": {
+        "goals": "Select meaningful React Native user actions, instrument them with PostHog capture calls, and record the resulting event contract.",
+        "did": "Created `.posthog-wizard-cache/.posthog-events.json` with five event definitions. Added guarded custom captures for completed password/client-trust sign-in (`user_signed_in`), completed verified sign-up (`user_signed_up`), successful sign-out before identity reset (`user_signed_out`), subscription detail expansion/collapse (`subscription_details_toggled`), and daily verse bookmark toggling (`daily_verse_bookmark_toggled`). Authentication captures run after the existing Clerk identification call; no PII is included in event properties.",
+        "forNextAgent": "All custom events use the initialized guarded `posthog` singleton and are attributed through the persisted Clerk identity. `app/(tabs)/index2.tsx` is an additional Expo route with the bookmark interaction; the configured tabs list uses `index.tsx` as Home. No tests/builds/linters were run because this capture task expressly prohibits them.",
+        "filesTouched": [
+          ".posthog-wizard-cache/.posthog-events.json",
+          "app/(auth)/sign-in.tsx",
+          "app/(auth)/sign-up.tsx",
+          "app/(tabs)/settings.tsx",
+          "app/(tabs)/index.tsx",
+          "app/(tabs)/index2.tsx"
+        ],
+        "evidence": "Final reads confirmed five planned-event records and `capture()` calls placed in successful Clerk finalization, successful sign-out before reset, and the two in-app press handlers. No PII is passed as an event property.",
+        "assumptions": "The existing Clerk identify calls persist identity before capture as established by the identify-task handoff; the shared client is configured via the root provider and optional singleton export."
+      },
+      "finishedAt": "2026-08-14T10:12:53.355Z"
+    },
+    {
+      "id": "eb1a8687-8af7-4b4e-bccd-218b06312ea8",
+      "type": "review",
+      "label": "Verify integration",
+      "status": "running",
+      "dependsOn": [
+        "6f1d313e-3f61-4598-9214-f12af187a7f4",
+        "d32eac87-ca5f-43fb-b5e6-0e74dc147e79",
+        "e74eb550-6c31-444d-ba28-51775f314f61",
+        "e3a19029-a0b3-4486-a431-947f2ecc814b",
+        "73b0497e-e61c-40e3-8006-88ceeabf8cc1"
+      ],
+      "inputs": {},
+      "attempts": 1,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:07:04.023Z",
+      "startedAt": "2026-08-14T10:12:57.863Z"
+    },
+    {
+      "id": "8a60d179-7b59-4cd1-80ce-b6ab8c7b6b5c",
+      "type": "dashboard",
+      "label": "Create product insights",
+      "status": "done",
+      "dependsOn": [
+        "e3a19029-a0b3-4486-a431-947f2ecc814b"
+      ],
+      "inputs": {},
+      "attempts": 1,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:07:04.024Z",
+      "startedAt": "2026-08-14T10:12:57.867Z",
+      "handoff": {
+        "goals": "Create a starter PostHog dashboard containing meaningful insights based on the events instrumented by the React Native integration.",
+        "did": "Created the PostHog dashboard `Analytics basics (wizard)` (ID 1995733), tagged `wizard`, with its required description. Created and attached five wizard-tagged insights: `Signup to sign-in funnel (wizard)` using `user_signed_up` → `user_signed_in`; `New user signups (wizard)` using `user_signed_up`; `Completed sign-ins (wizard)` using `user_signed_in`; `Subscription detail engagement (wizard)` using `subscription_details_toggled`; and `Daily verse bookmarks (wizard)` using `daily_verse_bookmark_toggled`. These supply acquisition, authentication, conversion, and feature-engagement dashboard views.",
+        "forNextAgent": "Dashboard URL: https://us.posthog.com/project/258299/dashboard/1995733. All insights are intentionally defined even if no events have arrived yet; they will populate when the newly instrumented events are captured.",
+        "filesTouched": [],
+        "evidence": "PostHog MCP returned dashboard ID 1995733 and URL https://us.posthog.com/project/258299/dashboard/1995733. It also returned successful saved insight responses with dashboard tile associations for insight IDs 11027372, 11027373, 11027376, 11027375, and 11027374.",
+        "assumptions": "The five event names and their intended semantics were taken directly from the upstream capture-task handoff, as instructed."
+      },
+      "finishedAt": "2026-08-14T10:14:09.126Z"
+    },
+    {
+      "id": "73b83d1e-7d28-4ae1-b3fd-ca9d2e98787b",
+      "type": "report",
+      "label": "Summarize integration",
+      "status": "pending",
+      "dependsOn": [
+        "eb1a8687-8af7-4b4e-bccd-218b06312ea8",
+        "8a60d179-7b59-4cd1-80ce-b6ab8c7b6b5c"
+      ],
+      "inputs": {},
+      "attempts": 0,
+      "maxAttempts": 2,
+      "enqueuedBy": "orchestrator",
+      "createdAt": "2026-08-14T10:07:05.818Z"
+    }
+  ]
+}

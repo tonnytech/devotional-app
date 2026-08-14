@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { posthog } from "@/lib/posthog";
 
 // Sample Reading Plans Data
 const FEATURED_PLANS = [
@@ -76,7 +77,13 @@ export default function HomeScreen() {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() => setIsBookmarked(!isBookmarked)}
+              onPress={() => {
+                const isBookmarkedNext = !isBookmarked;
+                posthog?.capture("daily_verse_bookmark_toggled", {
+                  is_bookmarked: isBookmarkedNext,
+                });
+                setIsBookmarked(isBookmarkedNext);
+              }}
               className='p-1'>
               <Text className='text-lg'>{isBookmarked ? "🔖" : "🏷️"}</Text>
             </TouchableOpacity>
