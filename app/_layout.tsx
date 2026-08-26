@@ -1,17 +1,19 @@
 import "@/global.css";
+import { ClerkProvider } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
-import {ClerkProvider} from '@clerk/expo';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { Text, View } from "react-native";
 import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
 import { useEffect } from "react";
+import { Text, View } from "react-native";
 
 import { posthog } from "@/lib/posthog";
 
 SplashScreen.preventAutoHideAsync();
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+const queryClient = new QueryClient();
 
 if (!publishableKey) {
   throw new Error("Add your clerk Publishable Key to the .env file");
@@ -40,17 +42,19 @@ export default function RootLayout() {
   );
 
   return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      {posthog ? (
-        <PostHogProvider client={posthog}>
-          <PostHogErrorBoundary fallback={RootErrorFallback}>
-            {routes}
-          </PostHogErrorBoundary>
-        </PostHogProvider>
-      ) : (
-        routes
-      )}
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        {posthog ? (
+          <PostHogProvider client={posthog}>
+            <PostHogErrorBoundary fallback={RootErrorFallback}>
+              {routes}
+            </PostHogErrorBoundary>
+          </PostHogProvider>
+        ) : (
+          routes
+        )}
+      </ClerkProvider>
+    </QueryClientProvider>
   );
 }
 

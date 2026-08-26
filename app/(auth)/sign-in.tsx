@@ -1,18 +1,18 @@
+import { posthog } from "@/lib/posthog";
+import { useSignIn } from "@clerk/expo";
+import { Link, useRouter, type Href } from "expo-router";
+import { styled } from "nativewind";
+import { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
-import { Link, useRouter, type Href } from "expo-router";
-import { useSignIn } from "@clerk/expo";
-import { useState } from "react";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
-import { styled } from "nativewind";
-import { posthog } from "@/lib/posthog";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -60,8 +60,8 @@ const SignIn = () => {
             return;
           }
 
-          if (session?.userId) {
-            posthog?.identify(session.userId, {
+          if (session?.user) {
+            posthog?.identify(session?.user?.id, {
               $set: { email: emailAddress },
             });
             posthog?.capture("user_signed_in", {
@@ -111,8 +111,8 @@ const SignIn = () => {
             return;
           }
 
-          if (session?.userId) {
-            posthog?.identify(session.userId, {
+          if (session?.user?.id) {
+            posthog?.identify(session.user?.id, {
               $set: { email: emailAddress },
             });
             posthog?.capture("user_signed_in", {
@@ -158,8 +158,8 @@ const SignIn = () => {
                     <Text className='auth-logo-mark-text'>R</Text>
                   </View>
                   <View>
-                    <Text className='auth-wordmark'>Recurrly</Text>
-                    <Text className='auth-wordmark-sub'>SUBSCRIPTIONS</Text>
+                    <Text className='auth-wordmark'>Ratc</Text>
+                    <Text className='auth-wordmark-sub'>MINISTRY</Text>
                   </View>
                 </View>
                 <Text className='auth-title'>Verify your identity</Text>
@@ -243,13 +243,14 @@ const SignIn = () => {
                   <Text className='auth-logo-mark-text'>R</Text>
                 </View>
                 <View>
-                  <Text className='auth-wordmark'>Recurrly</Text>
-                  <Text className='auth-wordmark-sub'>SUBSCRIPTIONS</Text>
+                  <Text className='auth-wordmark'>Ratc</Text>
+                  <Text className='auth-wordmark-sub'>MINISTRies</Text>
                 </View>
               </View>
               <Text className='auth-title'>Welcome back</Text>
               <Text className='auth-subtitle'>
-                Sign in to continue managing your subscriptions
+                God is ready to use you, to do something big and amaizing, to
+                change the whole world
               </Text>
             </View>
 
@@ -316,7 +317,7 @@ const SignIn = () => {
 
             {/* Sign-Up Link */}
             <View className='auth-link-row'>
-              <Text className='auth-link-copy'>Don't have an account?</Text>
+              <Text className='auth-link-copy'>Don&apos;t have an account?</Text>
               <Link href='/(auth)/sign-up' asChild>
                 <Pressable>
                   <Text className='auth-link'>Create Account</Text>

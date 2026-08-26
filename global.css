@@ -5,7 +5,7 @@
 @import "nativewind/theme";
 
 @theme {
-    --color-background: #fff9e3;
+    /* --color-background: #fff9e3;
     --color-foreground: #081126;
     --color-card: #fff8e7;
     --color-muted: #f6eecf;
@@ -15,7 +15,29 @@
     --color-border: rgba(0, 0, 0, 0.1);
     --color-success: #16a34a;
     --color-destructive: #dc2626;
-    --color-subscription: #8fd1bd;
+    --color-subscription: #8fd1bd; */
+
+    /* Surface & Base */
+  --color-background: #EEF1FC;            /* --sky: Soft, calming background */
+  --color-foreground: #201B4D;            /* --navy: Deep dark navy for high-contrast reading */
+  --color-card: #FFFFFF;                  /* --sky-card: Crisp white for devotional entry cards */
+  --color-muted: #DDE3F8;                 /* --sky-mid: Subtle background for secondary blocks */
+  --color-muted-foreground: #3A3FA0;      /* --blue-deep: Softer text for dates, subtitles, & captions */
+
+  /* Primary Brand & Accents */
+  --color-primary: #4F5FD1;               /* --blue: Core brand color for primary CTA buttons */
+  --color-primary-hover: #3A3FA0;         /* --blue-deep: Hover/Active state for buttons */
+  --color-accent: #7C3AED;                /* --gold (Purple): Elegant accent for highlights & bookmarks */
+  --color-accent-soft: #ECE0FB;           /* --yellow-soft: Light tint for active verse tags/badges */
+
+  /* UI Borders & Dividers */
+  --color-border: #CDD2F2;                /* --line: Subtle, clean structural borders */
+
+  /* Feedback & Special Indicators */
+  --color-success: #16A37A;               /* --green-ok: Tranquil emerald for streak counts & checkmarks */
+  --color-destructive: #E0245E;           /* --red-flag: For alerts, deleting notes, or verse unfavoriting */
+  --color-destructive-soft: #FBE1EA;      /* --red-soft: Soft background highlight for warnings */
+  --color-subscription: #9B59E0;          /* --yellow (Purple): Regal shade for premium or prayer tracker features */
 
     --spacing-0: 0px;
     --spacing-1: 4px;

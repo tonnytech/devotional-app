@@ -1,33 +1,65 @@
-import { tabs } from "@/constants/data3";
-import { colors, components } from "@/constants/theme";
+import { useAuth } from "@clerk/expo";
 import clsx from "clsx";
 import { Redirect, Tabs } from "expo-router";
-import { Image, View } from "react-native";
+import React from "react";
+import {
+  ActivityIndicator,
+  Image,
+  ImageSourcePropType,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuth } from "@clerk/expo";
+
+import { tabs } from "@/constants/data";
+import { colors, components } from "@/constants/theme";
 
 const tabBar = components.tabBar;
-const TabLayout = () => {
-  const {isSignedIn, isLoaded} = useAuth();
-  
-  const insets = useSafeAreaInsets();
-  if (!isLoaded) {
-    return null;
-  }
 
-  if (!isSignedIn){
-    return <Redirect href="/(auth)/sign-in" />
-  }
-  
-  const TabIcon = ({ focused, icon }: TabIconProps) => {
+interface TabIconProps {
+  focused: boolean;
+  icon: ImageSourcePropType;
+}
+
+// Extracted TabIcon outside the component to prevent re-creation on every render cycle
+const TabIcon: React.FC<TabIconProps> = ({ focused, icon }) => {
+  return (
+    <View className='tabs-icon items-center justify-center'>
+      <View
+        className={clsx(
+          "tabs-pill p-2 rounded-full",
+          focused && "tabs-active bg-white/20",
+        )}>
+        <Image
+          source={icon}
+          resizeMode='contain'
+          className='tabs-glyph w-6 h-6'
+          style={{
+            tintColor: focused ? "#FFFFFF" : "rgba(255, 255, 255, 0.6)",
+          }}
+        />
+      </View>
+    </View>
+  );
+};
+
+const TabLayout = () => {
+  const { isSignedIn, isLoaded } = useAuth();
+  const insets = useSafeAreaInsets();
+
+  // Show centered loader while Clerk checks auth state
+  if (!isLoaded) {
     return (
-      <View className='tabs-icon'>
-        <View className={clsx("tabs-pill", focused && "tabs-active")}>
-          <Image source={icon} resizeMode='contain' className='tabs-glyph' />
-        </View>
+      <View className='flex-1 bg-background justify-center items-center'>
+        <ActivityIndicator size='large' color={colors.primary} />
       </View>
     );
-  };
+  }
+
+  // Redirect to Sign-in if unauthorized
+  if (!isSignedIn) {
+    return <Redirect href='/(auth)/sign-in' />;
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -42,6 +74,10 @@ const TabLayout = () => {
           backgroundColor: colors.primary,
           borderTopWidth: 0,
           elevation: 0,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
         },
         tabBarItemStyle: {
           paddingVertical: tabBar.height / 2 - tabBar.iconFrame / 1.6,
@@ -50,6 +86,7 @@ const TabLayout = () => {
           width: tabBar.iconFrame,
           height: tabBar.iconFrame,
           alignItems: "center",
+          justifyContent: "center",
         },
       }}>
       {tabs.map((tab) => (
@@ -58,6 +95,8 @@ const TabLayout = () => {
           name={tab.name}
           options={{
             title: tab.title,
+            // Hides screen from tab bar if marked hidden in constants
+            href: tab.hidden ? null : undefined,
             tabBarIcon: ({ focused }) => (
               <TabIcon focused={focused} icon={tab.icon} />
             ),

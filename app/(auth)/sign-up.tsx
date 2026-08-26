@@ -1,18 +1,18 @@
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { useAuth, useSignUp } from "@clerk/expo";
 import { Link, useRouter, type Href } from "expo-router";
-import { useSignUp, useAuth } from "@clerk/expo";
-import { useState } from "react";
-import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { styled } from "nativewind";
 import { usePostHog } from "posthog-react-native";
+import { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -126,8 +126,8 @@ const SignUp = () => {
                     <Text className='auth-logo-mark-text'>R</Text>
                   </View>
                   <View>
-                    <Text className='auth-wordmark'>Recurrly</Text>
-                    <Text className='auth-wordmark-sub'>SUBSCRIPTIONS</Text>
+                    <Text className='auth-wordmark'>Ratc</Text>
+                    <Text className='auth-wordmark-sub'>MINISTRY</Text>
                   </View>
                 </View>
                 <Text className='auth-title'>Verify your email</Text>
@@ -204,13 +204,13 @@ const SignUp = () => {
                   <Text className='auth-logo-mark-text'>R</Text>
                 </View>
                 <View>
-                  <Text className='auth-wordmark'>Recurrly</Text>
-                  <Text className='auth-wordmark-sub'>SUBSCRIPTIONS</Text>
+                  <Text className='auth-wordmark'>Ratc</Text>
+                  <Text className='auth-wordmark-sub'>MINISTRIES</Text>
                 </View>
               </View>
               <Text className='auth-title'>Create your account</Text>
               <Text className='auth-subtitle'>
-                Start tracking your subscriptions and never miss a payment
+                Welcome. We&apos;ve been waiting for you.
               </Text>
             </View>
 

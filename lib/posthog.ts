@@ -21,6 +21,6 @@ export const posthog = isPostHogConfigured
   ? new PostHog(projectToken!, {
       host: host!,
       captureAppLifecycleEvents: true,
-      debug: __DEV__,
     })
   : null;
+  
