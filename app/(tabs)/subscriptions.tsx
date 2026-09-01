@@ -1,17 +1,19 @@
-import DevotionalCard from "@/components/DevotionalCard";
-import PageHeader from "@/components/PageHeader";
-import { DEVOTIONALS } from "@/constants/data";
-import { styled } from "nativewind";
 import React, { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
+  RefreshControl,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
+import { styled } from "nativewind";
+
+import DevotionalCard from "@/components/DevotionalCard";
+import PageHeader from "@/components/PageHeader";
+import { useDevotionals } from "@/lib/hooks/useDevotionals";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -20,17 +22,18 @@ type FilterTab = "all" | "paid" | "unpaid";
 const Devotionals = () => {
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const { devotionals, loading, error, refresh } = useDevotionals();
 
   const filteredDevotionals = useMemo(() => {
     const q = query.trim().toLowerCase();
 
-    return DEVOTIONALS.filter((item) => {
+    return devotionals.filter((item) => {
       // 1. Filter by Active Tab (all, paid, unpaid)
       const matchesTab =
         activeTab === "all"
           ? true
           : activeTab === "paid"
-            ? item.isPaid
+            ? Boolean(item.isPaid)
             : !item.isPaid;
 
       // 2. Filter by Search Query
@@ -39,22 +42,21 @@ const Devotionals = () => {
         item.title?.toLowerCase().includes(q) ||
         item.description?.toLowerCase().includes(q) ||
         item.month?.toLowerCase().includes(q) ||
-        item.year?.toString().includes(q);
+        String(item.year || "").includes(q);
 
       return matchesTab && matchesQuery;
     });
-  }, [query, activeTab]);
+  }, [devotionals, query, activeTab]);
 
   const tabs: { label: string; value: FilterTab }[] = [
     { label: "All", value: "all" },
-    { label: "Paid", value: "paid" },
-    { label: "Unpaid", value: "unpaid" },
+    { label: "Explore", value: "paid" },
+    { label: "Available", value: "unpaid" },
   ];
 
   return (
     <SafeAreaView className='p-5 bg-background flex-1'>
       {/* Header Component */}
-
       <PageHeader title='Devotionals' />
 
       {/* Search Bar */}
@@ -63,7 +65,7 @@ const Devotionals = () => {
         onChangeText={setQuery}
         placeholder='Search devotionals by title, month, or year...'
         placeholderTextColor='rgba(0,0,0,0.4)'
-        className='rounded-xl border border-border p-3 my-4 bg-card text-foreground'
+        className='rounded-xl border border-border p-3 my-4 bg-card text-foreground font-sans'
       />
 
       {/* Segmented Filter Menu (All / Paid / Unpaid) */}
@@ -88,21 +90,43 @@ const Devotionals = () => {
         })}
       </View>
 
-      {/* Devotionals List */}
-      <FlatList
-        data={filteredDevotionals}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => <DevotionalCard devotional={item} />}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
-        ListEmptyComponent={
-          <View className='py-10 items-center'>
-            <Text className='text-foreground/50 font-sans'>
-              No devotionals found.
-            </Text>
-          </View>
-        }
-      />
+      {/* Loading State */}
+      {loading && devotionals.length === 0 ? (
+        <View className='py-20 items-center justify-center'>
+          <ActivityIndicator size='large' className='text-primary' />
+        </View>
+      ) : error ? (
+        /* Error State */
+        <View className='py-10 items-center justify-center'>
+          <Text className='text-foreground/70 font-sans mb-3 text-center'>
+            {error}
+          </Text>
+          <TouchableOpacity
+            onPress={refresh}
+            className='bg-primary px-4 py-2 rounded-xl'>
+            <Text className='text-white font-sans-bold'>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        /* Devotionals List */
+        <FlatList
+          data={filteredDevotionals}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => <DevotionalCard devotional={item} />}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={refresh} />
+          }
+          ListEmptyComponent={
+            <View className='py-10 items-center'>
+              <Text className='text-foreground/50 font-sans'>
+                No devotionals found.
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 };

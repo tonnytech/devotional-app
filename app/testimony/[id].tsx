@@ -1,22 +1,26 @@
-import { TESTIMONIES_DATA } from "@/constants/data";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Share,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { styled } from "nativewind";
-import { useMemo, useState } from "react";
-import { ScrollView, Share, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
+
+import { useTestimony } from "@/lib/hooks/useTestimonies";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
 const TestimonyDetail = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-
+  const { testimony, loading, error, like } = useTestimony(id || "");
   const [hasPraised, setHasPraised] = useState(false);
-
-  const testimony = useMemo(() => {
-    return TESTIMONIES_DATA.find((item) => item.id === Number(id));
-  }, [id]);
 
   const handleShare = async () => {
     if (!testimony) return;
@@ -24,17 +28,32 @@ const TestimonyDetail = () => {
       await Share.share({
         message: `Read this encouraging testimony: "${testimony.title}" by ${testimony.testifier_name}`,
       });
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  if (!testimony) {
+  const handleLikeToggle = () => {
+    if (!hasPraised) {
+      setHasPraised(true);
+      like();
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView className='flex-1 bg-background justify-center items-center p-5'>
+        <ActivityIndicator size='large' className='text-primary' />
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !testimony) {
     return (
       <SafeAreaView className='flex-1 bg-background justify-center items-center p-5'>
         <Ionicons name='alert-circle-outline' size={48} color='gray' />
         <Text className='text-foreground/70 font-sans text-base my-3'>
-          Testimony not found.
+          {error || "Testimony not found."}
         </Text>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -45,9 +64,9 @@ const TestimonyDetail = () => {
     );
   }
 
-  const currentLikes = hasPraised
-    ? (testimony.likesCount ?? 0) + 1
-    : (testimony.likesCount ?? 0);
+  const testimonyDate = testimony.testimonyDate
+    ? String(testimony.testimonyDate).split("T")[0]
+    : String(testimony.createdAt).split("T")[0];
 
   return (
     <SafeAreaView className='flex-1 bg-background p-5'>
@@ -83,14 +102,19 @@ const TestimonyDetail = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Category & Date */}
         <View className='flex-row justify-between items-center mb-2'>
-          <View className='bg-primary/10 px-3 py-1 rounded-full border border-primary/20'>
-            <Text className='text-xs font-sans-bold text-primary'>
-              {testimony.category}
-            </Text>
-          </View>
+          {testimony.category ? (
+            <View className='bg-primary/10 px-3 py-1 rounded-full border border-primary/20'>
+              <Text className='text-xs font-sans-bold text-primary'>
+                {testimony.category}
+              </Text>
+            </View>
+          ) : (
+            <View />
+          )}
 
           <Text className='text-xs font-sans text-foreground/50'>
-            {`${testimony.createdAt} • ${testimony.readTime}`}
+            {testimonyDate}{" "}
+            {testimony.readTime ? `• ${testimony.readTime}` : ""}
           </Text>
         </View>
 
@@ -113,16 +137,16 @@ const TestimonyDetail = () => {
             <Text className='text-sm font-sans-bold text-foreground'>
               {testimony.testifier_name}
             </Text>
-            {testimony.testifier_location && (
+            {testimony.testifier_location ? (
               <Text className='text-xs font-sans text-foreground/60'>
                 {testimony.testifier_location}
               </Text>
-            )}
+            ) : null}
           </View>
         </View>
 
         {/* Scripture Anchor / Key Verse */}
-        {testimony.keyVerse && (
+        {testimony.keyVerse ? (
           <View className='bg-card border-l-4 border-primary p-4 rounded-r-2xl border border-border mb-6'>
             <Text className='text-xs font-sans-bold text-primary uppercase mb-1'>
               Anchor Scripture
@@ -131,7 +155,7 @@ const TestimonyDetail = () => {
               &quot;{testimony.keyVerse}&quot;
             </Text>
           </View>
-        )}
+        ) : null}
 
         {/* Narrative Body */}
         <View className='mb-8'>
@@ -151,7 +175,7 @@ const TestimonyDetail = () => {
           </Text>
 
           <TouchableOpacity
-            onPress={() => setHasPraised(!hasPraised)}
+            onPress={handleLikeToggle}
             activeOpacity={0.8}
             className={`flex-row items-center px-5 py-3 rounded-xl ${
               hasPraised
@@ -168,7 +192,7 @@ const TestimonyDetail = () => {
               className={`font-sans-bold text-sm ${
                 hasPraised ? "text-white" : "text-primary"
               }`}>
-              Praise God! ({currentLikes})
+              Praise God! ({testimony.likesCount || 0})
             </Text>
           </TouchableOpacity>
         </View>

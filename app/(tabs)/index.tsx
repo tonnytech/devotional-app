@@ -2,7 +2,7 @@ import { useHomeData } from "@/lib/hooks/useHome";
 import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { styled } from "nativewind";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -17,7 +17,7 @@ import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 import AnnouncementCard from "@/components/AnnouncementCard";
 import ListHeading from "@/components/ListHeading";
-import UpcomingEventCard from "@/components/UpcomingEventCard";
+import UpcomingEventCard from "@/components/UpcomingEventCard2";
 import images from "@/constants/images";
 import { posthog } from "@/lib/posthog";
 import { AnnouncementItem, EventItem } from "@/types/api";
@@ -30,10 +30,22 @@ export default function HomeScreen() {
   const [expandedAnnouncementIndex, setExpandedAnnouncementIndex] = useState<
     number | null
   >(null);
-
   // User details with fallback
-  const userName = user?.firstName || "Guest";
+  // const userName = user?.firstName || "Guest";
+  const userName =
+    user?.fullName ||
+    user?.firstName ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    "Guest";
   const userAvatar = user?.imageUrl ? { uri: user.imageUrl } : images.avartar;
+  // ✅ Compute the image source directly without state
+  // const userAvatar = useMemo(() => {
+  //   if (user?.imageUrl) {
+  //     return { uri: user.imageUrl };
+  //   }
+  //   return require("@/assets/images/default-avatar.png"); // or fallback object
+  // }, [user?.imageUrl]);
   // Render initial loading state
   if (loading && !events.length && !announcements.length) {
     return (
@@ -151,6 +163,10 @@ export default function HomeScreen() {
             announcementDate={item.announcementDate}
             isImportant={item.isImportant}
             link={item.link}
+            category={item.category}
+            location={item.location}
+            time={item.time}
+            description={item.description}
             expanded={expandedAnnouncementIndex === index}
             onPress={() => {
               const isExpanded = expandedAnnouncementIndex === index;

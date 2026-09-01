@@ -1,28 +1,27 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
-  View,
-  Text,
-  ScrollView,
+  ActivityIndicator,
   Image,
-  TouchableOpacity,
+  ScrollView,
   Share,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { styled } from "nativewind";
-import { BLOGS_DATA } from "@/constants/data";
+
+import images from "@/constants/images";
+import { useBlog } from "@/lib/hooks/useBlogs";
 
 const SafeAreaView = styled(RNSafeAreaView);
-
 
 const BlogDetail = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-
-  const blog = useMemo(() => {
-    return BLOGS_DATA.find((item) => item.id === id);
-  }, [id]);
+  const { blog, loading, error } = useBlog(id || "");
 
   const handleShare = async () => {
     if (!blog) return;
@@ -30,17 +29,25 @@ const BlogDetail = () => {
       await Share.share({
         message: `Check out this article: "${blog.title}" by ${blog.author}`,
       });
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  if (!blog) {
+  if (loading) {
+    return (
+      <SafeAreaView className='flex-1 bg-background justify-center items-center p-5'>
+        <ActivityIndicator size='large' className='text-primary' />
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !blog) {
     return (
       <SafeAreaView className='flex-1 bg-background justify-center items-center p-5'>
         <Ionicons name='document-text-outline' size={48} color='gray' />
         <Text className='text-foreground/70 font-sans text-base my-3'>
-          Blog article not found.
+          {error || "Blog article not found."}
         </Text>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -50,6 +57,10 @@ const BlogDetail = () => {
       </SafeAreaView>
     );
   }
+
+  const publishedDate = blog.publishedAt
+    ? String(blog.publishedAt).split("T")[0]
+    : "";
 
   return (
     <SafeAreaView className='flex-1 bg-background p-5'>
@@ -86,15 +97,21 @@ const BlogDetail = () => {
         {/* Cover Image */}
         <View className='relative rounded-2xl overflow-hidden mb-4 h-52 bg-border'>
           <Image
-            source={{ uri: blog.imageUrl ?? undefined }}
+            source={
+              blog.imageUrl
+                ? { uri: blog.imageUrl }
+                : images.splashPattern || undefined
+            }
             className='w-full h-full'
             resizeMode='cover'
           />
-          <View className='absolute top-3 left-3 bg-primary px-3 py-1 rounded-full'>
-            <Text className='text-xs font-sans-bold text-white uppercase'>
-              {blog.category}
-            </Text>
-          </View>
+          {blog.category ? (
+            <View className='absolute top-3 left-3 bg-primary px-3 py-1 rounded-full'>
+              <Text className='text-xs font-sans-bold text-white uppercase'>
+                {blog.category}
+              </Text>
+            </View>
+          ) : null}
         </View>
 
         {/* Title */}
@@ -116,14 +133,14 @@ const BlogDetail = () => {
             <Text className='text-sm font-sans-bold text-foreground'>
               {blog.author}
             </Text>
-            {blog.authorRole && (
+            {blog.authorRole ? (
               <Text className='text-xs font-sans text-foreground/60'>
                 {blog.authorRole}
               </Text>
-            )}
+            ) : null}
           </View>
           <Text className='text-xs font-sans text-foreground/50'>
-            {blog.date} • {blog.readTime}
+            {publishedDate} {blog.readTime ? `• ${blog.readTime}` : ""}
           </Text>
         </View>
 

@@ -26,3 +26,21 @@ export function useBlogs(category?: string) {
 
   return { blogs, loading, error, refresh: fetchBlogs };
 }
+
+export function useBlog(id: number | string) {
+  const [blog, setBlog] = useState<BlogItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    api
+      .getBlogById(id)
+      .then((res) => setBlog(res.data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  return { blog, loading, error };
+}

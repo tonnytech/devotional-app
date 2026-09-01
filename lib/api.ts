@@ -3,9 +3,11 @@ import {
   ApiItemResponse,
   ApiListResponse,
   AnnouncementItem,
-  BlogItem,
+  BookItem,
+  BookReviewItem,
   Devotional,
   EventItem,
+  NewBookReviewPayload,
   NewTestimonyPayload,
   TestimonyItem,
   ThemeVerseItem,
@@ -34,7 +36,8 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   // Devotionals
-  getDevotionals: () => fetcher<ApiListResponse<Devotional>>("/devotionals"),
+  getDevotionals: (category: string | undefined) =>
+    fetcher<ApiListResponse<Devotional>>("/devotionals"),
   getDevotionalById: (id: number | string) =>
     fetcher<ApiItemResponse<Devotional>>(`/devotionals/${id}`),
   toggleReadingRef: (referenceId: number | string) =>
@@ -43,13 +46,23 @@ export const api = {
       { method: "POST" },
     ),
 
-  // Blogs
-  getBlogs: (category?: string) => {
+  // Books
+  getBooks: (category?: string) => {
     const query = category ? `?category=${encodeURIComponent(category)}` : "";
-    return fetcher<ApiListResponse<BlogItem>>(`/blogs${query}`);
+    return fetcher<ApiListResponse<BookItem>>(`/books${query}`);
   },
-  getBlogById: (id: number | string) =>
-    fetcher<ApiItemResponse<BlogItem>>(`/blogs/${id}`),
+  getBookById: (id: number | string) =>
+    fetcher<ApiItemResponse<BookItem>>(`/books/${id}`),
+  submitBookReview: (bookId: number | string, data: NewBookReviewPayload) =>
+    fetcher<ApiItemResponse<BookReviewItem>>(`/books/${bookId}/reviews`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  likeBookReview: (reviewId: number | string) =>
+    fetcher<ApiItemResponse<{ likesCount: number }>>(
+      `/reviews/${reviewId}/like`,
+      { method: "POST" },
+    ),
 
   // Announcements
   getAnnouncements: () =>

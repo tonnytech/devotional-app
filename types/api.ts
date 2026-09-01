@@ -26,7 +26,9 @@ export interface DevotionalReading {
   title: string;
   reflection: string;
   prayer: string | null;
-  references?: DailyReadingRef[];
+  scriptureRef: string;
+  scriptureText: string;
+  bibleReadings?: DailyReadingRef[];
 }
 
 export interface Devotional {
@@ -41,6 +43,39 @@ export interface Devotional {
   readings?: DevotionalReading[];
 }
 
+export interface BookReviewItem {
+  id: number;
+  reviewerName: string;
+  reviewerLocation: string | null;
+  rating: number;
+  title: string | null;
+  content: string;
+  likesCount: number;
+  createdAt: string;
+}
+
+export interface BookItem {
+  id: number;
+  title: string;
+  author: string;
+  description: string | null;
+  coverImageUrl: string | null;
+  category: string | null;
+  isbn: string | null;
+  createdAt: string;
+  reviewCount?: number;
+  avgRating?: number;
+  reviews?: BookReviewItem[];
+}
+
+export interface NewBookReviewPayload {
+  reviewerName: string;
+  reviewerLocation?: string;
+  rating: number;
+  title?: string;
+  content: string;
+}
+
 export interface BlogItem {
   id: number;
   title: string;
@@ -48,6 +83,7 @@ export interface BlogItem {
   author: string;
   authorRole: string | null;
   category: string | null;
+  readTime?: string | null;
   imageUrl: string | null;
   takeaways: string[];
   content: string;
@@ -60,8 +96,12 @@ export interface AnnouncementItem {
   title: string;
   announcementDate: string;
   isImportant: boolean;
+  location: string | null;
   link: string | null;
   createdAt: string;
+  time: string | null;
+  category: string | null;
+  description: string | null;
 }
 
 export interface TestimonyItem {
@@ -75,6 +115,8 @@ export interface TestimonyItem {
   isApproved: boolean;
   testimonyDate: string;
   createdAt: string;
+  readTime?: string | null;
+  category: string | null;
 }
 
 export interface NewTestimonyPayload {
@@ -96,9 +138,15 @@ export interface ThemeVerseItem {
 
 export interface EventItem {
   id: number;
-  name: string;
   eventDate: string;
   eventTime: string;
   location: string;
   description?: string | null;
+  title: string;
+  slug: string;
+  imageUrl: string | null;
+  registrationUrl: string | null;
+  isFeatured: boolean;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }

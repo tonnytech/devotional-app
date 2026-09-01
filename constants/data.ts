@@ -272,11 +272,7 @@ export const BLOGS_DATA: BlogFormData[] = [
     readTime: "5 min read",
     category: "Spiritual Growth",
     imageUrl: "https://images.unsplash.com/photo-1509021436468-d51039746b4b?w=800&auto=format&fit=crop&q=80",
-    takeaways: [
-      "Grace is an unearned gift, not a reward for performance.",
-      "Extending grace to others starts with recognizing God's grace toward you.",
-      "Daily reflection helps shift our mindset from obligation to gratitude.",
-    ],
+    takeaways: ["Grace is an unearned gift, not a reward for performance.|Extending grace to others starts with recognizing God's grace toward you.|Daily reflection helps shift our mindset from obligation to gratitude."],
     content: "Grace is often described as unmerited favor, but in the rhythm of daily life, it is much more than a theological concept—it is the very breath of our spiritual journey.\n\nWhen we wake up each morning, we are immediately met with choices. We can rely on our own strength and strive for perfection, or we can rest in the knowledge that God's grace is sufficient for every challenge ahead.\n\nLiving in grace means accepting that failure is not final. When we fall short, grace invites us to repent and stand back up without carrying the weight of guilt. Furthermore, as recipients of divine grace, we are called to extend that same forgiveness and kindness to those around us—in our workplaces, homes, and communities.",
     blogDate: ""
   },
@@ -290,11 +286,7 @@ export const BLOGS_DATA: BlogFormData[] = [
     readTime: "4 min read",
     category: "Prayer",
     imageUrl: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80",
-    takeaways: [
-      "Consistency in prayer builds spiritual stamina.",
-      "God answers in His timing, which deepens our trust.",
-      "Prayer changes our alignment with God's heart.",
-    ],
+    takeaways: "Consistency in prayer builds spiritual stamina.|God answers in His timing, which deepens our trust.|Prayer changes our alignment with God's heart.",
     content: "Persistence in prayer is not about convincing a reluctant God to act; it is about aligning our hearts with His sovereign will over time.\n\nIn Luke 18, Jesus taught the parable of the persistent widow to show us that we should always pray and not give up. Prayer transforms us while we wait. It refines our desires, strengthens our faith, and builds unwavering endurance.\n\nMake prayer a daily sanctuary rather than an emergency exit. Set aside dedicated time each morning to bring your petitions, worries, and thanksgivings before the Lord.",
     blogDate: ""
   },

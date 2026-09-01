@@ -1,21 +1,30 @@
-import { useEffect, useState } from "react";
+// lib/hooks/useDevotionals.ts
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import { Devotional } from "../../types/api";
 
-export function useDevotionals() {
+export function useDevotionals(category?: string) {
   const [devotionals, setDevotionals] = useState<Devotional[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    api
-      .getDevotionals()
-      .then((res) => setDevotionals(res.data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const fetchDevotionals = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.getDevotionals(category);
+      setDevotionals(res.data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [category]);
 
-  return { devotionals, loading, error };
+  useEffect(() => {
+    fetchDevotionals();
+  }, [fetchDevotionals]);
+
+  return { devotionals, loading, error, refresh: fetchDevotionals };
 }
 
 export function useDevotional(id: number | string) {
@@ -25,6 +34,7 @@ export function useDevotional(id: number | string) {
 
   useEffect(() => {
     if (!id) return;
+    setLoading(true);
     api
       .getDevotionalById(id)
       .then((res) => setDevotional(res.data))
@@ -32,15 +42,5 @@ export function useDevotional(id: number | string) {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const toggleReference = async (referenceId: number) => {
-    try {
-      const res = await api.toggleReadingRef(referenceId);
-      // Optimistically update reading status locally if needed
-      return res.data;
-    } catch (err: any) {
-      throw new Error(err.message);
-    }
-  };
-
-  return { devotional, loading, error, toggleReference };
+  return { devotional, loading, error };
 }

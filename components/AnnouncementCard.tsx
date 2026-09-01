@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 import clsx from "clsx";
 import React from "react";
@@ -14,7 +15,7 @@ const CATEGORY_CONFIG: Record<
     border: string;
   }
 > = {
-  Weddings: {
+  Wedding: {
     icon: "heart-outline",
     bg: "bg-rose-500/10",
     text: "text-rose-400",
@@ -50,7 +51,8 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   expanded = false,
   onPress,
 }) => {
-  const config = CATEGORY_CONFIG[category ?? "General"] || CATEGORY_CONFIG.default;
+  const config =
+    CATEGORY_CONFIG[category ?? "General"] || CATEGORY_CONFIG.default;
 
   return (
     <Pressable
@@ -98,7 +100,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               className='mr-1 text-foreground/50'
             />
             <Text className='text-xs font-sans text-foreground/60'>
-              {[announcementDate, time].filter(Boolean).join(" • ")}
+              {[ formatDateTime(announcementDate), time].filter(Boolean).join(" • ")}
             </Text>
           </View>
         </View>
@@ -143,7 +145,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                   Date:
                 </Text>
                 <Text className='text-xs font-sans-bold text-foreground'>
-                  {announcementDate}
+                  {formatDateTime(announcementDate)}
                 </Text>
               </View>
             ) : null}

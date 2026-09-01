@@ -35,39 +35,40 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
   const daysLeft = getDaysLeft(eventDate);
 
   // Status configuration for the pill badge
+  // Adjusted for better contrast in both light and dark themes
   const getBadgeStyle = () => {
     if (daysLeft === null) return null;
     if (daysLeft < 0) {
       return {
-        bg: "bg-rose-500/15 border-rose-500/30",
-        text: "text-rose-400",
+        bg: "bg-rose-500/10 border-rose-500/20",
+        text: "text-rose-500",
         label: "Ended",
       };
     }
     if (daysLeft === 0) {
       return {
-        bg: "bg-emerald-500/15 border-emerald-500/30",
-        text: "text-emerald-400",
+        bg: "bg-emerald-500/10 border-emerald-500/20",
+        text: "text-emerald-500",
         label: "Today",
       };
     }
     if (daysLeft === 1) {
       return {
-        bg: "bg-amber-500/15 border-amber-500/30",
-        text: "text-amber-400",
+        bg: "bg-amber-500/10 border-amber-500/20",
+        text: "text-amber-600 dark:text-amber-400",
         label: "Tomorrow",
       };
     }
     if (daysLeft <= 3) {
       return {
-        bg: "bg-amber-500/15 border-amber-500/30",
-        text: "text-amber-400",
+        bg: "bg-amber-500/10 border-amber-500/20",
+        text: "text-amber-600 dark:text-amber-400",
         label: `${daysLeft} days left`,
       };
     }
     return {
-      bg: "bg-indigo-500/15 border-indigo-500/30",
-      text: "text-indigo-300",
+      bg: "bg-primary/10 border-primary/20",
+      text: "text-primary",
       label: `${daysLeft} days left`,
     };
   };
@@ -75,18 +76,23 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
   const badge = getBadgeStyle();
 
   return (
-    <View className='w-72 bg-slate-800/90 rounded-2xl p-4 mr-4 border border-slate-700/60 justify-between shadow-md'>
+    <View className='w-72 bg-card rounded-2xl p-4 border border-border justify-between shadow-sm'>
       {/* Top Header: Date/Time Info & Countdown Badge */}
-      <View className='flex-row justify-between items-start mb-3.5'>
+      <View className='flex-row justify-between gap-0.5 items-start mb-3.5'>
         {/* Date & Time Container */}
-        <View className='flex-row items-center bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-700/40 gap-x-2'>
-          <Ionicons name='calendar-outline' size={14} color='#94A3B8' />
+        <View className='flex-row items-center bg-background px-3 py-2 rounded-xl border border-border gap-x-2'>
+          <Ionicons
+            name='calendar-outline'
+            size={14}
+            color='currentColor'
+            className='text-foreground/70'
+          />
           <View>
-            <Text className='text-slate-200 text-xs font-semibold leading-4'>
+            <Text className='text-foreground text-xs font-sans-bold leading-4'>
               {formatDateTime(eventDate)}
             </Text>
             {eventTime ? (
-              <Text className='text-slate-400 text-[10px] font-medium leading-3 mt-0.5'>
+              <Text className='text-foreground/60 text-[10px] font-sans leading-3 mt-0.5'>
                 {eventTime}
               </Text>
             ) : null}
@@ -95,8 +101,9 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
 
         {/* Days Left Status Badge */}
         {badge && (
-          <View className={`px-2.5 py-1 rounded-full border ${badge.bg}`}>
-            <Text className={`text-[11px] font-bold ${badge.text}`}>
+          <View
+            className={`flex-row items-center bg-background px-2.5 py-2.5 rounded-xl border border-border ${badge.bg}`}>
+            <Text className={`text-[11px] font-sans-bold ${badge.text}`}>
               {badge.label}
             </Text>
           </View>
@@ -106,14 +113,14 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
       {/* Main Body Details */}
       <View className='mb-1'>
         <Text
-          className='text-white font-bold text-base mb-1.5 tracking-tight'
+          className='text-foreground font-sans-bold text-base mb-1.5 tracking-tight'
           numberOfLines={1}>
           {title}
         </Text>
 
         {description ? (
           <Text
-            className='text-slate-400 text-xs leading-4 mb-3'
+            className='text-foreground/70 text-xs font-sans leading-4 mb-3'
             numberOfLines={2}>
             {description}
           </Text>
@@ -121,10 +128,15 @@ const UpcomingEventCard = ({ event }: UpcomingEventCardProps) => {
 
         {/* Location Footer */}
         {location ? (
-          <View className='flex-row items-center mt-1 bg-slate-700/30 py-1.5 px-2.5 rounded-lg border border-slate-700/30 self-start'>
-            <Ionicons name='location-sharp' size={12} color='#38BDF8' />
+          <View className='flex-row items-center mt-1 bg-background py-1.5 px-2.5 rounded-lg border border-border self-start'>
+            <Ionicons
+              name='location-sharp'
+              size={12}
+              color='currentColor'
+              className='text-primary'
+            />
             <Text
-              className='text-slate-300 text-[11px] font-medium ml-1.5'
+              className='text-foreground/80 text-[11px] font-sans-bold ml-1.5'
               numberOfLines={1}>
               {location}
             </Text>

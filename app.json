@@ -10,10 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tonnytei.native"
+      "bundleIdentifier": "com.tonnytei.ratcapp"
     },
     "android": {
-      "package": "com.tonnytei.native",
+      "package": "com.tonnytei.ratcapp",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
