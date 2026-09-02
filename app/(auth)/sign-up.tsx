@@ -1,4 +1,5 @@
 import { useAuth, useSignUp } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter, type Href } from "expo-router";
 import { styled } from "nativewind";
 import { usePostHog } from "posthog-react-native";
@@ -16,6 +17,8 @@ import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
+const MIN_PASSWORD_LENGTH = 8;
+
 const SignUp = () => {
   const { signUp, errors, fetchStatus } = useSignUp();
   const { isSignedIn } = useAuth();
@@ -25,6 +28,7 @@ const SignUp = () => {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Validation states
   const [emailTouched, setEmailTouched] = useState(false);
@@ -34,9 +38,12 @@ const SignUp = () => {
   const emailValid =
     emailAddress.length === 0 ||
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress);
-  const passwordValid = password.length === 0 || password.length >= 8;
+  const passwordValid =
+    password.length === 0 || password.length >= MIN_PASSWORD_LENGTH;
   const formValid =
-    emailAddress.length > 0 && password.length >= 8 && emailValid;
+    emailAddress.length > 0 &&
+    password.length >= MIN_PASSWORD_LENGTH &&
+    emailValid;
 
   const handleSubmit = async () => {
     if (!formValid) return;
@@ -244,19 +251,31 @@ const SignUp = () => {
 
                 <View className='auth-field'>
                   <Text className='auth-label'>Password</Text>
-                  <TextInput
-                    className={`auth-input ${passwordTouched && !passwordValid && "auth-input-error"}`}
-                    value={password}
-                    placeholder='Create a strong password'
-                    placeholderTextColor='rgba(0, 0, 0, 0.4)'
-                    secureTextEntry
-                    onChangeText={setPassword}
-                    onBlur={() => setPasswordTouched(true)}
-                    autoComplete='password-new'
-                  />
+                  <View className='relative justify-center'>
+                    <TextInput
+                      className={`auth-input pr-12 ${passwordTouched && !passwordValid && "auth-input-error"}`}
+                      value={password}
+                      placeholder='Create a strong password'
+                      placeholderTextColor='rgba(0, 0, 0, 0.4)'
+                      secureTextEntry={!showPassword}
+                      onChangeText={setPassword}
+                      onBlur={() => setPasswordTouched(true)}
+                      autoComplete='password-new'
+                    />
+                    <Pressable
+                      onPress={() => setShowPassword((prev) => !prev)}
+                      className='absolute right-3'
+                      hitSlop={8}>
+                      <Ionicons
+                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                        size={20}
+                        color='rgba(0, 0, 0, 0.5)'
+                      />
+                    </Pressable>
+                  </View>
                   {passwordTouched && !passwordValid && (
                     <Text className='auth-error'>
-                      Password must be at least 8 characters
+                      Password must be at least {MIN_PASSWORD_LENGTH} characters
                     </Text>
                   )}
                   {errors.fields.password && (
@@ -266,7 +285,7 @@ const SignUp = () => {
                   )}
                   {!passwordTouched && (
                     <Text className='auth-helper'>
-                      Minimum 8 characters required
+                      Minimum {MIN_PASSWORD_LENGTH} characters required
                     </Text>
                   )}
                 </View>
