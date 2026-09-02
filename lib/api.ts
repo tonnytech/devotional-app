@@ -14,8 +14,7 @@ import {
 } from "../types/api";
 
 const BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ||
-  "https://devotionals-api.tonnytei.dpdns.org/api/v1";
+  process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
