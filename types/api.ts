@@ -62,6 +62,8 @@ export interface BookItem {
   coverImageUrl: string | null;
   category: string | null;
   isbn: string | null;
+  purchaseUrl: string | null;
+  howToBuy: string | null;
   createdAt: string;
   reviewCount?: number;
   avgRating?: number;
@@ -149,4 +151,26 @@ export interface EventItem {
   isFeatured: boolean;
   createdAt: Date | string;
   updatedAt: Date | string;
+}
+
+export interface CalendarEventItem {
+  id: number;
+  title: string;
+  slug: string | null;
+  description: string | null;
+  location: string | null;
+  startDate: string;
+  endDate: string | null;
+  allDay: boolean;
+  eventTime: string | null;
+  category: string | null;
+  color: string | null;
+  imageUrl: string | null;
+  registrationUrl: string | null;
+  isFeatured: boolean;
+  isRecurring: boolean;
+  recurrenceRule: string | null;
+  recurrenceEndDate: string | null;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -35,6 +35,8 @@ const ArticlesScreen = () => {
     refresh: refreshTestimonies,
   } = useTestimonies();
 
+  console.log(books);
+
   const isLoading = activeTab === "books" ? loadingBooks : loadingTestimonies;
   const currentRefresh =
     activeTab === "books" ? refreshBooks : refreshTestimonies;

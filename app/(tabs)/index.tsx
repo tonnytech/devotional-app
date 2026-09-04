@@ -1,5 +1,6 @@
 import { useHomeData } from "@/lib/hooks/useHome";
 import { useUser } from "@clerk/expo";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { styled } from "nativewind";
 import { useState, useMemo } from "react";
@@ -26,6 +27,7 @@ const SafeAreaView = styled(RNSafeAreaView);
 
 export default function HomeScreen() {
   const { user } = useUser();
+  const router = useRouter();
   const { themeVerse, events, announcements, loading, refresh } = useHomeData();
   const [expandedAnnouncementIndex, setExpandedAnnouncementIndex] = useState<
     number | null
@@ -125,7 +127,12 @@ export default function HomeScreen() {
 
             {/* Upcoming Events Section */}
             <View className='mb-6'>
-              <ListHeading title='Upcoming services' />
+              {/* <ListHeading title='Upcoming services' /> */}
+              <ListHeading
+                title='Upcoming services'
+                showViewAll={events.length > 0}
+                onViewAll={() => router.push("/events")}
+              />
               <FlatList
                 data={events}
                 renderItem={({ item }: { item: EventItem }) => (
@@ -146,7 +153,11 @@ export default function HomeScreen() {
             </View>
 
             {/* Announcements Section Header */}
-            <ListHeading title='Announcements' />
+            <ListHeading
+              title='Announcements'
+              showViewAll={announcements.length > 0}
+              onViewAll={() => router.push("/announcements")}
+            />
           </>
         )}
         data={announcements}

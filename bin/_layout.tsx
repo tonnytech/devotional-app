@@ -2,9 +2,13 @@ import { useAuth } from "@clerk/expo";
 import clsx from "clsx";
 import { Redirect, Tabs } from "expo-router";
 import React from "react";
-import { ActivityIndicator, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ImageSourcePropType,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { SvgProps } from "react-native-svg";
 
 import { tabs } from "@/constants/data";
 import { colors, components } from "@/constants/theme";
@@ -13,11 +17,11 @@ const tabBar = components.tabBar;
 
 interface TabIconProps {
   focused: boolean;
-  Icon: React.FC<SvgProps>;
+  icon: ImageSourcePropType;
 }
 
 // Extracted TabIcon outside the component to prevent re-creation on every render cycle
-const TabIcon: React.FC<TabIconProps> = ({ focused, Icon }) => {
+const TabIcon: React.FC<TabIconProps> = ({ focused, icon }) => {
   return (
     <View className='tabs-icon items-center justify-center'>
       <View
@@ -25,10 +29,13 @@ const TabIcon: React.FC<TabIconProps> = ({ focused, Icon }) => {
           "tabs-pill p-2 rounded-full",
           focused && "tabs-active bg-white/20",
         )}>
-        <Icon
-          width={24}
-          height={24}
-          color={focused ? "#FFFFFF" : "rgba(255, 255, 255, 0.6)"}
+        <Image
+          source={icon}
+          resizeMode='contain'
+          className='tabs-glyph w-6 h-6'
+          style={{
+            tintColor: focused ? "#FFFFFF" : "rgba(255, 255, 255, 0.6)",
+          }}
         />
       </View>
     </View>
@@ -91,7 +98,7 @@ const TabLayout = () => {
             // Hides screen from tab bar if marked hidden in constants
             href: tab.hidden ? null : undefined,
             tabBarIcon: ({ focused }) => (
-              <TabIcon focused={focused} Icon={tab.icon} />
+              <TabIcon focused={focused} icon={tab.icon} />
             ),
           }}
         />

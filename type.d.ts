@@ -148,12 +148,12 @@ declare global {
     onPress?: () => void;
   }
 
-  export interface TabItem {
-    name: string;
-    title: string;
-    hidden?: any;
-    icon: any; // Or ImageSourcePropType from 'react-native'
-  }
+ export type TabItem = {
+   name: string;
+   title: string;
+   icon: React.FC<SvgProps>;
+   hidden?: boolean;
+ };
 
   // ================from the api==================
 
@@ -318,6 +318,14 @@ declare global {
   }
 
   export type ThemeVerseFormData = Omit<ThemeVerseItem, "id" | "createdAt">;
+
+  declare module "*.svg" {
+    import type { SvgProps } from "react-native-svg";
+
+    const content: React.FC<SvgProps>;
+
+    export default content;
+  }
 }
 
 export {};
